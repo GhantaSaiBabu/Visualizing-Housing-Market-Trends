@@ -1,22 +1,35 @@
-from flask import Flask, render_template
+from flask import Flask, send_file, abort
+import os
 
 app = Flask(__name__)
 
-@app.route('/')
+# Helper: safely return file from project root
+def serve_root_file(filename: str):
+    filepath = os.path.join(app.root_path, filename)
+    if os.path.exists(filepath):
+        return send_file(filepath)
+    else:
+        abort(404)
+
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return serve_root_file("index.html")
 
-@app.route('/about')
+@app.route("/about")
 def about():
-    return render_template('about.html')
+    return serve_root_file("about.html")
 
-@app.route('/dashboard')
+@app.route("/dashboard")
 def dashboard():
-    return render_template('dashboard.html')
+    return serve_root_file("dashboard.html")
 
-@app.route('/story')
+@app.route("/story")
 def story():
-    return render_template('story.html')
+    return serve_root_file("story.html")
 
-if __name__ == '__main__':
+# (Optional) If you keep assets in /static,
+# Flask will serve them automatically:  url_for('static', filename='logo.webp')
+
+if __name__ == "__main__":
+    # Use host="0.0.0.0" for Docker or external access
     app.run(debug=True)
